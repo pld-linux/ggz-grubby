@@ -1,0 +1,63 @@
+--- ggz-grubby-0.0.14.1/configure.ac.orig	2013-02-01 16:57:23.840985429 +0100
++++ ggz-grubby-0.0.14.1/configure.ac	2013-02-01 17:00:14.267648544 +0100
+@@ -85,7 +85,9 @@
+ if test "$enable_ruby" = yes; then
+ 	echo -n "Extra check: ruby... "
+ 
+-	incs=`ruby -r rbconfig -e 'printf("%s", Config::CONFIG@<:@"archdir"@:>@)' 2>/dev/null`
++	inc1=`ruby -r rbconfig -e 'printf("%s", Config::CONFIG@<:@"rubyhdrdir"@:>@)' 2>/dev/null`
++	inc2=`ruby -r rbconfig -e 'printf("%s/%s", Config::CONFIG@<:@"rubyhdrdir"@:>@, Config::CONFIG@<:@"arch"@:>@)' 2>/dev/null`
++	incs="$inc1 $inc2"
+ 	libs=`ruby -r rbconfig -e 'printf("%s", Config::CONFIG@<:@"libdir"@:>@)' 2>/dev/null`
+ 	rver=`ruby -r rbconfig -e 'printf("%s", Config::CONFIG@<:@"ruby_install_name"@:>@)' 2>/dev/null`
+ 
+@@ -107,8 +109,8 @@
+ 		ruby_libraries=""
+ 		enable_ruby=no
+ 	else
+-		ruby_includes="-I $ruby_includes"
+-		ruby_libraries="-L $ruby_libraries -l$rver"
++		ruby_includes="-I$inc1 -I$inc2"
++		ruby_libraries="-L$ruby_libraries -l$rver"
+ 		AC_MSG_RESULT(ok.)
+ 		AC_SUBST(ruby_includes)
+ 		AC_SUBST(ruby_libraries)
+--- ggz-grubby-0.0.14.1/grubby/modules/embed.c.orig	2008-01-05 20:02:42.000000000 +0100
++++ ggz-grubby-0.0.14.1/grubby/modules/embed.c	2013-02-01 17:50:05.344252870 +0100
+@@ -183,20 +183,21 @@
+ #ifdef EMBED_RUBY
+ 			if(type == TYPE_RUBY)
+ 			{
++				void *rbnode;
+ 				answer = rb_ary_new();
+ 				rb_define_variable("$answer", &answer);
+ 				rb_ary_push(answer, rb_str_new2(message->message));
+ 				/*rb_global_variable(&answer);*/
+ 
+ 				ruby_script("grubby-embedded");
+-				rb_load_file(script);
++				rbnode = rb_load_file(script);
+ 
+ 				switch(fork())
+ 				{
+ 					case -1:
+ 						return NULL;
+ 					case 0:
+-						ruby_run();
++						ruby_run_node(rbnode);
+ 						exit(0);
+ 						break;
+ 					default:
+@@ -205,10 +206,10 @@
+ 
+ 				if(!NIL_P(answer))
+ 				{
+-					if(RARRAY(answer)->len > 0)
++					if(RARRAY_LEN(answer) > 0)
+ 					{
+ 						tmp = rb_ary_pop(answer);
+-						message->message = STR2CSTR(tmp);
++						message->message = StringValuePtr(tmp);
+ 						return message;
+ 					}
+ 				}

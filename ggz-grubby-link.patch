@@ -1,0 +1,63 @@
+--- ggz-grubby-0.0.14.1/grubby/src/Makefile.am.orig	2008-02-14 18:36:57.000000000 +0100
++++ ggz-grubby-0.0.14.1/grubby/src/Makefile.am	2013-01-31 21:23:51.259119715 +0100
+@@ -1,7 +1,7 @@
+ bin_PROGRAMS = grubby
+ 
+ grubby_SOURCES = guru.c main.c module.c
+-grubby_LDADD = $(LIB_GGZCORE) $(LIB_GETTEXT) $(LIB_DL)
++grubby_LDADD = $(LIB_GGZCORE) $(LIB_GGZ) $(LIB_GETTEXT) $(LIB_DL)
+ grubby_LDFLAGS = $(GGZCORE_LDFLAGS)
+ 
+ grubbydir = $(libdir)/grubby/coremodules
+@@ -17,13 +17,15 @@
+ endif
+ 
+ libguru_netggz_la_SOURCES = net.c
+-libguru_netggz_la_LIBADD = $(LIB_GGZCORE)
++libguru_netggz_la_LIBADD = $(LIB_GGZCORE) $(LIB_GGZ)
+ libguru_netggz_la_LDFLAGS = -module -avoid-version $(GGZCORE_LDFLAGS)
+ 
+ libguru_netconsole_la_SOURCES = netconsole.c
++libguru_netconsole_la_LIBADD = $(LIB_GGZ)
+ libguru_netconsole_la_LDFLAGS = -module -avoid-version
+ 
+ libguru_netirc_la_SOURCES = netirc.c
++libguru_netirc_la_LIBADD = $(LIB_GGZ)
+ libguru_netirc_la_LDFLAGS = -module -avoid-version
+ 
+ if GRUBBY_SILC
+@@ -33,6 +35,7 @@
+ endif
+ 
+ libguru_i18n_la_SOURCES = i18n.c
++libguru_i18n_la_LIBADD = $(LIB_GGZ)
+ libguru_i18n_la_LDFLAGS = -module -avoid-version
+ 
+ libguru_player_la_SOURCES = player.c
+--- ggz-grubby-0.0.14.1/grubby/modules/Makefile.am.orig	2008-01-05 20:02:42.000000000 +0100
++++ ggz-grubby-0.0.14.1/grubby/modules/Makefile.am	2013-02-01 17:52:55.327582659 +0100
+@@ -32,7 +32,7 @@
+ #libgurumod_banner_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_embed_la_SOURCES = embed.c
+-libgurumod_embed_la_LIBADD = $(ruby_libraries) $(perl_libraries) $(python_libraries) $(tcl_libraries) $(php_libraries)
++libgurumod_embed_la_LIBADD = $(LIB_GGZ) $(ruby_libraries) $(perl_libraries) $(python_libraries) $(tcl_libraries) $(php_libraries)
+ libgurumod_embed_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_exec_la_SOURCES = exec.c
+@@ -43,6 +43,7 @@
+ libgurumod_extra_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_game_la_SOURCES = game.c
++libgurumod_game_la_LIBADD = $(LIB_GGZ)
+ libgurumod_game_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_learning_la_SOURCES = learning.c
+@@ -55,6 +56,7 @@
+ libgurumod_programming_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_self_la_SOURCES = self.c
++libgurumod_self_la_LIBADD = $(LIB_GGZ)
+ libgurumod_self_la_LDFLAGS = -module -avoid-version
+ 
+ libgurumod_simplereturn_la_SOURCES = simplereturn.c
