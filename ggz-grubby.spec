@@ -6,7 +6,7 @@ Summary:	Grubby - GGZ chat bot
 Summary(pl.UTF-8):	Grubby - bot dla chatu GGZ
 Name:		ggz-grubby
 Version:	0.0.14.1
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		X11/Applications/Games
 Source0:	http://mirrors.dotsrc.org/ggzgamingzone/ggz/%{version}/%{name}-%{version}.tar.gz
@@ -29,6 +29,7 @@ BuildRequires:	python-devel >= 2.2
 BuildRequires:	ruby-devel >= 1.9
 %{?with_silc:BuildRequires:	silc-toolkit-devel >= 1.1}
 BuildRequires:	tcl-devel >= 8.5
+Requires(post,preun):	ggz-client-libs >= 0.0.14
 Requires:	ggz-client-libs-devel >= 0.0.14
 Requires:	libggz-devel >= 0.0.14
 %{?with_silc:Requires:	silc-toolkit >= 1.1}
@@ -67,15 +68,30 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/grubby/*modules/*.{la,a}
 
+# collect modules.ggz pieces
+install -d $RPM_BUILD_ROOT%{_datadir}/ggz/ggz-config
+cp -p games/guru-chess/module.dsc $RPM_BUILD_ROOT%{_datadir}/ggz/ggz-config/guru-chess.dsc
+cp -p games/guru-ttt/module.dsc $RPM_BUILD_ROOT%{_datadir}/ggz/ggz-config/guru-ttt.dsc
+%{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/ggz.modules
+
 %find_lang grubby
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+%{_bindir}/ggz-config --install --modfile=%{_datadir}/ggz/ggz-config/guru-chess.dsc --force
+%{_bindir}/ggz-config --install --modfile=%{_datadir}/ggz/ggz-config/guru-ttt.dsc --force
+
+%preun
+if [ "$1" = "0" ]; then
+	%{_bindir}/ggz-config --remove --modfile=%{_datadir}/ggz/ggz-config/guru-chess.dsc
+	%{_bindir}/ggz-config --remove --modfile=%{_datadir}/ggz/ggz-config/guru-ttt.dsc
+fi
+
 %files -f grubby.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README README.GGZ TODO
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/ggz.modules
 %attr(755,root,root) %{_bindir}/grubby
 %attr(755,root,root) %{_bindir}/grubby-config
 %attr(755,root,root) %{_libdir}/ggz/guru-chess
@@ -85,6 +101,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/grubby/coremodules/libguru_*.so
 %dir %{_libdir}/grubby/modules
 %attr(755,root,root) %{_libdir}/grubby/modules/libgurumod_*.so
+%{_datadir}/ggz/ggz-config/guru-chess.dsc
+%{_datadir}/ggz/ggz-config/guru-ttt.dsc
 %dir %{_datadir}/grubby
 %attr(755,root,root) %{_datadir}/grubby/*.pl
 %attr(755,root,root) %{_datadir}/grubby/*.rb
