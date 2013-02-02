@@ -6,7 +6,7 @@ Summary:	Grubby - GGZ chat bot
 Summary(pl.UTF-8):	Grubby - bot dla chatu GGZ
 Name:		ggz-grubby
 Version:	0.0.14.1
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		X11/Applications/Games
 Source0:	http://mirrors.dotsrc.org/ggzgamingzone/ggz/%{version}/%{name}-%{version}.tar.gz
@@ -30,7 +30,7 @@ BuildRequires:	ruby-devel >= 1.9
 %{?with_silc:BuildRequires:	silc-toolkit-devel >= 1.1}
 BuildRequires:	tcl-devel >= 8.5
 Requires(post,preun):	ggz-client-libs >= 0.0.14
-Requires:	ggz-client-libs-devel >= 0.0.14
+Requires:	ggz-client-libs >= 0.0.14
 Requires:	libggz-devel >= 0.0.14
 %{?with_silc:Requires:	silc-toolkit >= 1.1}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
